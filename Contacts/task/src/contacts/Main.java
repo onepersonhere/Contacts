@@ -6,7 +6,7 @@ public class Main {
     public static void main(String[] args) {
         while (true){
             new Contacts();
-            System.out.println("Enter action (add, remove, edit, count, list, exit): ");
+            System.out.println("Enter action (add, remove, edit, count, info, exit): ");
             Scanner scanner = new Scanner(System.in);
             String action = scanner.nextLine();
 
@@ -23,12 +23,13 @@ public class Main {
                 case "count":
                     Contacts.countContacts();
                     break;
-                case "list":
-                    Contacts.listContacts();
+                case "info":
+                    Contacts.info();
                     break;
                 case "exit":
                     System.exit(0);
             }
+            System.out.println();
         }
     }
 }

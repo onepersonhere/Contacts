@@ -371,6 +371,15 @@ files:
         }
     }
   learner_created: true
+- name: src/contacts/Person.java
+  visible: true
+  learner_created: true
+- name: src/contacts/Organisation.java
+  visible: true
+  learner_created: true
 feedback_link: https://hyperskill.org/projects/43/stages/230/implement#comment
-status: Unchecked
-record: -1
+status: Solved
+feedback:
+  message: Congratulations!
+  time: Fri, 25 Jun 2021 08:03:07 UTC
+record: 3

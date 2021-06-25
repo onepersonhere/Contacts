@@ -1,17 +1,17 @@
 package contacts;
 
+import java.text.SimpleDateFormat;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Record {
-    private String name;
-    private String surname;
     private String number = "";
-
-    Record(String name, String surname, String number){
-        this.name = name;
-        this.surname = surname;
+    private String timeCreated;
+    private String timeLastEdited = "";
+    private boolean isPerson;
+    Record(String number){
         setNumber(number);
+        timeCreated = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm").format(new java.util.Date());
     }
 
     public String getNumber() {
@@ -24,6 +24,7 @@ public class Record {
     public void setNumber(String number) {
         if(checkValidity(number)) {
             this.number = number;
+            setTimeLastEdited();
         }else{
             this.number = "";
         }
@@ -48,26 +49,30 @@ public class Record {
         return false;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getSurname() {
-        return surname;
-    }
-
-    public void setSurname(String surname) {
-        this.surname = surname;
-    }
-
     public boolean hasNumber(){
         if(number.equals("")){
             return false;
         }
         return true;
+    }
+
+    public void setTimeLastEdited() {
+        this.timeLastEdited = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm").format(new java.util.Date());
+    }
+
+    public String getTimeCreated() {
+        return timeCreated;
+    }
+
+    public String getTimeLastEdited() {
+        return timeLastEdited;
+    }
+
+    public void setPerson(boolean person) {
+        isPerson = person;
+    }
+
+    public boolean getPerson(){
+        return isPerson;
     }
 }

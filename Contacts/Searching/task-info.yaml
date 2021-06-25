@@ -202,6 +202,394 @@ files:
     \        }\n        catch (Exception ex) {\n            return new CheckResult(false,\
     \ \"Can't check the answer\");\n        }\n    }\n}\n"
   learner_created: false
+- name: src/contacts/Organisation.java
+  visible: true
+  text: |
+    package contacts;
+
+    public class Organisation extends Record {
+        private String orgName;
+        private String address;
+        public Organisation(String orgName, String address, String number) {
+            super(number);
+            orgName(orgName);
+            address(address);
+            setPerson(false);
+        }
+
+        private void orgName(String orgName){
+            if(orgName.equals("")){
+                System.out.println("Bad organisation name!");
+                this.orgName = "[no data]";
+            }else{
+                this.orgName = orgName;
+            }
+        }
+        private void address(String address){
+            if(address.equals("")){
+                System.out.println("Bad address!");
+                this.address = "[no data]";
+            }else{
+                this.address = address;
+            }
+        }
+
+        public void setOrgName(String orgName) {
+            orgName(orgName);
+            setTimeLastEdited();
+        }
+
+        public void setAddress(String address) {
+            address(address);
+            setTimeLastEdited();
+        }
+
+        public String getAddress() {
+            return address;
+        }
+
+        public String getOrgName() {
+            return orgName;
+        }
+    }
+  learner_created: true
+- name: src/contacts/Record.java
+  visible: true
+  text: |
+    package contacts;
+
+    import java.text.SimpleDateFormat;
+    import java.util.regex.Matcher;
+    import java.util.regex.Pattern;
+
+    public class Record {
+        private String number = "";
+        private String timeCreated;
+        private String timeLastEdited = "";
+        private boolean isPerson;
+        Record(String number){
+            setNumber(number);
+            timeCreated = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm").format(new java.util.Date());
+        }
+
+        public String getNumber() {
+            if(hasNumber()){
+                return number;
+            }
+            return "[no number]";
+        }
+
+        public void setNumber(String number) {
+            if(checkValidity(number)) {
+                this.number = number;
+                setTimeLastEdited();
+            }else{
+                this.number = "";
+            }
+        }
+
+        private boolean checkValidity(String number){
+            //check value using regex and set value to field only if sastify these rules:
+            //Phone number is split using space or dash
+            //Prefix may have +
+            //1st/2nd group have (), max only 1 grp
+            //grp contains number/upper/lowercase, at least 2 symbols in length
+            //1st grp may have 1 symbol in length
+
+            Pattern pattern = Pattern.compile("(^\\+?\\d{0,100}(\\w+[ -]+)*([ -]+\\(\\w+\\)[ -]+|[ -]+\\(\\w+\\)$|\\(\\w+\\)[ -]+|\\(\\w+\\)$){0,1}([ -]?\\w{2,100})*)");
+            Matcher matcher = pattern.matcher(number);
+            boolean matchFound = matcher.find();
+            //System.out.println(matcher.group());
+            if(matchFound && matcher.group().equals(number)){
+                return true;
+            }
+            System.out.println("Wrong number format!");
+            return false;
+        }
+
+        public boolean hasNumber(){
+            if(number.equals("")){
+                return false;
+            }
+            return true;
+        }
+
+        public void setTimeLastEdited() {
+            this.timeLastEdited = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm").format(new java.util.Date());
+        }
+
+        public String getTimeCreated() {
+            return timeCreated;
+        }
+
+        public String getTimeLastEdited() {
+            return timeLastEdited;
+        }
+
+        public void setPerson(boolean person) {
+            isPerson = person;
+        }
+
+        public boolean getPerson(){
+            return isPerson;
+        }
+    }
+  learner_created: true
+- name: src/contacts/Person.java
+  visible: true
+  text: |
+    package contacts;
+
+    public class Person extends Record{
+        private String name;
+        private String surname;
+        private String birthDate;
+        private String gender;
+        public Person(String name, String surname, String birthDate, String gender,String number) {
+            super(number);
+            name(name);
+            surname(surname);
+            birthDate(birthDate);
+            gender(gender);
+            setPerson(true);
+        }
+        private void birthDate(String birthDate){
+            if(birthDate.equals("")){
+                System.out.println("Bad birth date!");
+                this.birthDate = "[no data]";
+            }else{
+                this.birthDate = birthDate;
+            }
+        }
+        private void gender(String gender){
+            if(gender.equals("M") || gender.equals("F")){
+                this.gender = gender;
+            }else{
+                System.out.println("Bad gender!");
+                this.gender = "[no data]";
+            }
+        }
+        private void name(String name){
+            if(name.equals("")){
+                System.out.println("Bad name!");
+                this.name = "[no data]";
+            }else{
+                this.name = name;
+            }
+        }
+        private void surname(String surname){
+            if(surname.equals("")){
+                System.out.println("Bad surname!");
+                this.surname = "[no data]";
+            }else{
+                this.surname = surname;
+            }
+        }
+
+        public void setSurname(String surname) {
+            surname(surname);
+            setTimeLastEdited();
+        }
+
+        public String getSurname() {
+            return surname;
+        }
+
+        public void setName(String name) {
+            name(name);
+            setTimeLastEdited();
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setBirthDate(String birthDate) {
+            birthDate(birthDate);
+            setTimeLastEdited();
+        }
+
+        public String getBirthDate() {
+            return birthDate;
+        }
+
+        public void setGender(String gender) {
+            gender(gender);
+            setTimeLastEdited();
+        }
+
+        public String getGender() {
+            return gender;
+        }
+    }
+  learner_created: true
+- name: src/contacts/Contacts.java
+  visible: true
+  text: |
+    package contacts;
+
+    import java.util.ArrayList;
+    import java.util.List;
+    import java.util.Scanner;
+
+    public class Contacts {
+        static Scanner scanner = new Scanner(System.in);
+        private static List<Record> recordList = new ArrayList<>();
+        Contacts(){
+        }
+        //add/remove/edit/get number of records
+        //if number is empty -> [no number]
+        public static void addContacts(){
+            System.out.println("Enter the type (person, organisation): ");
+            String type = scanner.nextLine();
+            if(type.equals("person")){
+                addPerson();
+            }else if(type.equals("organization")){
+                addOrg();
+            }
+        }
+        public static void addPerson(){
+
+            System.out.println("Enter the name of the person: ");
+            String name = scanner.nextLine();
+            System.out.println("Enter the surname of the person: ");
+            String surname = scanner.nextLine();
+            System.out.println("Enter the birth date: ");
+            String birthDate = scanner.nextLine();
+            System.out.println("Enter the gender (M, F): ");
+            String gender = scanner.nextLine();
+            System.out.println("Enter the number: ");
+            String number = scanner.nextLine();
+
+            Record person = new Person(name, surname, birthDate, gender, number);
+            recordList.add(person);
+            System.out.println("The record added.");
+        }
+        public static void addOrg(){
+
+            System.out.println("Enter the organisation name: ");
+            String name = scanner.nextLine();
+            System.out.println("Enter the address: ");
+            String address = scanner.nextLine();
+            System.out.println("Enter the number: ");
+            String number = scanner.nextLine();
+
+            Record org = new Organisation(name, address, number);
+            recordList.add(org);
+            System.out.println("The record added.");
+        }
+        public static void editContacts(){
+            if(recordList.isEmpty()){
+                System.out.println("No records to edit!");
+            }else {
+                listContacts();
+                System.out.println("Select a record: ");
+                int idx = scanner.nextInt() - 1;
+                Record record = recordList.get(idx);
+                if(record.getPerson()) {
+                    Person person = (Person) record;
+                    System.out.println("Select a field (name, surname, birth, gender, number): ");
+                    scanner.nextLine();
+                    String field = scanner.nextLine();
+                    switch (field) {
+                        case "name":
+                            System.out.println("Enter name: ");
+                            person.setName(scanner.nextLine());
+                            break;
+                        case "surname":
+                            System.out.println("Enter surname: ");
+                            person.setSurname(scanner.nextLine());
+                            break;
+                        case "number":
+                            System.out.println("Enter number: ");
+                            person.setNumber(scanner.nextLine());
+                            break;
+                        case "birth":
+                            System.out.println("Enter birth date: ");
+                            person.setBirthDate(scanner.nextLine());
+                            break;
+                        case "gender":
+                            System.out.println("Enter gender: ");
+                            person.setGender(scanner.nextLine());
+                            break;
+                    }
+                }else {
+                    Organisation org = (Organisation) record;
+                    System.out.println("Select a field (name, address, number): ");
+                    scanner.nextLine();
+                    String field = scanner.nextLine();
+                    switch (field) {
+                        case "name":
+                            System.out.println("Enter organisation name: ");
+                            org.setOrgName(scanner.nextLine());
+                            break;
+                        case "address":
+                            System.out.println("Enter address: ");
+                            org.setAddress(scanner.nextLine());
+                            break;
+                        case "number":
+                            System.out.println("Enter number: ");
+                            org.setNumber(scanner.nextLine());
+                            break;
+                    }
+                }
+                System.out.println("The record updated!");
+                recordList.set(idx, record);
+            }
+        }
+        public static void listContacts(){
+            for(int i = 0; i < recordList.size(); i++){
+                Record record = recordList.get(i);
+                if(record.getPerson()){
+                    Person person = (Person) record;
+                    System.out.println((i+1) + ". " + person.getName()
+                            + " " + person.getSurname());
+                }else {
+                    Organisation org = (Organisation) record;
+                    System.out.println((i+1) + ". " + org.getOrgName());
+                }
+            }
+        }
+        public static void info(){
+            listContacts();
+            System.out.println("Enter index to show info: ");
+            int i = scanner.nextInt() - 1;
+            Record record = recordList.get(i);
+            if(record.getPerson()){
+                Person person = (Person) record;
+                System.out.println("Name: " + person.getName()
+                                + "\nSurname: " + person.getSurname()
+                                + "\nBirth date: " + person.getBirthDate()
+                                + "\nGender: " + person.getGender()
+                                + "\nNumber: " + person.getNumber()
+                                + "\nTime created: " + person.getTimeCreated()
+                                + "\nTime last edit: " + person.getTimeLastEdited());
+            }else {
+                Organisation org = (Organisation) record;
+                System.out.println("Organization name: " + org.getOrgName()
+                        + "\nNumber: " + org.getNumber()
+                        + "\nAddress: " + org.getAddress()
+                        + "\nTime created: " + org.getTimeCreated()
+                        + "\nTime last edit: " + org.getTimeLastEdited());
+            }
+            scanner.nextLine();
+        }
+        public static void removeContacts(){
+            if(recordList.isEmpty()){
+                System.out.println("No records to remove!");
+            }else{
+                listContacts();
+                System.out.println("Select a record: ");
+                recordList.remove(scanner.nextInt() - 1);
+                System.out.println("The record removed!");
+            }
+        }
+
+        public static void countContacts(){
+            System.out.println("The Phone Book has " + recordList.size() + " records.");
+        }
+    }
+  learner_created: true
 feedback_link: https://hyperskill.org/projects/43/stages/231/implement#comment
 status: Unchecked
 record: -1
