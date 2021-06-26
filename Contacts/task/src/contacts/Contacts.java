@@ -1,10 +1,15 @@
 package contacts;
 
+import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-public class Contacts {
+public class Contacts implements Serializable {
+    private static final long serialVersionUID = 1L;
     static Scanner scanner = new Scanner(System.in);
     private static List<Record> recordList = new ArrayList<>();
     Contacts(){
@@ -50,114 +55,155 @@ public class Contacts {
         recordList.add(org);
         System.out.println("The record added.");
     }
-    public static void editContacts(){
+    public static void editContacts(int idx){
         if(recordList.isEmpty()){
             System.out.println("No records to edit!");
         }else {
-            listContacts();
-            System.out.println("Select a record: ");
-            int idx = scanner.nextInt() - 1;
             Record record = recordList.get(idx);
-            if(record.getPerson()) {
-                Person person = (Person) record;
-                System.out.println("Select a field (name, surname, birth, gender, number): ");
-                scanner.nextLine();
-                String field = scanner.nextLine();
-                switch (field) {
-                    case "name":
-                        System.out.println("Enter name: ");
-                        person.setName(scanner.nextLine());
-                        break;
-                    case "surname":
-                        System.out.println("Enter surname: ");
-                        person.setSurname(scanner.nextLine());
-                        break;
-                    case "number":
-                        System.out.println("Enter number: ");
-                        person.setNumber(scanner.nextLine());
-                        break;
-                    case "birth":
-                        System.out.println("Enter birth date: ");
-                        person.setBirthDate(scanner.nextLine());
-                        break;
-                    case "gender":
-                        System.out.println("Enter gender: ");
-                        person.setGender(scanner.nextLine());
-                        break;
-                }
-            }else {
-                Organisation org = (Organisation) record;
-                System.out.println("Select a field (name, address, number): ");
-                scanner.nextLine();
-                String field = scanner.nextLine();
-                switch (field) {
-                    case "name":
-                        System.out.println("Enter organisation name: ");
-                        org.setOrgName(scanner.nextLine());
-                        break;
-                    case "address":
-                        System.out.println("Enter address: ");
-                        org.setAddress(scanner.nextLine());
-                        break;
-                    case "number":
-                        System.out.println("Enter number: ");
-                        org.setNumber(scanner.nextLine());
-                        break;
-                }
+
+            System.out.println("Select a field "+ Arrays.toString(record.returnFields()) +": ");
+            String field = scanner.nextLine();
+            switch (field) {
+                case "name":
+                    System.out.println("Enter name: ");
+                    record.setName(scanner.nextLine());
+                    break;
+                case "surname":
+                    System.out.println("Enter surname: ");
+                    record.setSurname(scanner.nextLine());
+                    break;
+                case "number":
+                    System.out.println("Enter number: ");
+                    record.setNumber(scanner.nextLine());
+                    break;
+                case "birth":
+                    System.out.println("Enter birth date: ");
+                    record.setBirthDate(scanner.nextLine());
+                    break;
+                case "gender":
+                    System.out.println("Enter gender: ");
+                    record.setGender(scanner.nextLine());
+                    break;
+                case "address":
+                    System.out.println("Enter address: ");
+                    record.setAddress(scanner.nextLine());
             }
-            System.out.println("The record updated!");
+            System.out.println("Saved");
+            info(idx);
             recordList.set(idx, record);
+        }
+    }
+    public static void searchContacts(){
+        System.out.println("Enter search query: ");
+        String q = scanner.nextLine();
+        Pattern pattern = Pattern.compile(q, Pattern.CASE_INSENSITIVE);
+        List<Integer> idxLst = new ArrayList<>();
+        int n = 1;
+        for(int i = 0; i < recordList.size(); i++){
+            Record record = recordList.get(i);
+            String name = record.getName() + " " + record.getSurname();
+            name = name.trim();
+            String searchStr = record.getName() + record.getSurname() +
+                    record.getBirthDate() + record.getGender() + record.getNumber()
+                    + record.getAddress();
+            Matcher matcher = pattern.matcher(searchStr);
+            if(matcher.find()){
+                System.out.println(n + ". " + name);
+                idxLst.add(i);
+                n++;
+            }
+        }
+
+        System.out.println("[search] Enter action ([number], back, again): ");
+        String action = scanner.nextLine();
+        switch (action) {
+            case "back":
+                break;
+            case "again":
+                searchContacts();
+                break;
+            default:
+                int num = Integer.parseInt(action);
+                try {
+                    int idx = idxLst.get(num - 1);
+                    info(idx);
+                    recordMenu(idx);
+                }catch(IndexOutOfBoundsException ignored){}
+                break;
+        }
+
+    }
+    public static void recordMenu(int idx){
+        System.out.println("[record] Enter action (edit, delete, menu): ");
+        String action = scanner.nextLine();
+        switch (action){
+            case "edit":
+                editContacts(idx);
+                recordMenu(idx);
+                break;
+            case "delete":
+                removeContacts(idx);
+                recordMenu(idx);
+                break;
+            case "menu":
+                break;
         }
     }
     public static void listContacts(){
         for(int i = 0; i < recordList.size(); i++){
             Record record = recordList.get(i);
-            if(record.getPerson()){
-                Person person = (Person) record;
-                System.out.println((i+1) + ". " + person.getName()
-                        + " " + person.getSurname());
-            }else {
-                Organisation org = (Organisation) record;
-                System.out.println((i+1) + ". " + org.getOrgName());
-            }
+            String name = record.getName() + " " + record.getSurname();
+            name = name.trim();
+            System.out.println((i+1) + ". " + name);
+        }
+        System.out.println();
+        System.out.println("[list] Enter action ([number], back): ");
+        String action = scanner.nextLine();
+        if(action.equals("back")){
+            //back to menu
+        }else{
+            int idx = Integer.parseInt(action);
+            info(idx - 1);
+            recordMenu(idx - 1);
         }
     }
-    public static void info(){
-        listContacts();
-        System.out.println("Enter index to show info: ");
-        int i = scanner.nextInt() - 1;
+    public static void info(int i){
         Record record = recordList.get(i);
-        if(record.getPerson()){
-            Person person = (Person) record;
-            System.out.println("Name: " + person.getName()
-                            + "\nSurname: " + person.getSurname()
-                            + "\nBirth date: " + person.getBirthDate()
-                            + "\nGender: " + person.getGender()
-                            + "\nNumber: " + person.getNumber()
-                            + "\nTime created: " + person.getTimeCreated()
-                            + "\nTime last edit: " + person.getTimeLastEdited());
-        }else {
-            Organisation org = (Organisation) record;
-            System.out.println("Organization name: " + org.getOrgName()
-                    + "\nNumber: " + org.getNumber()
-                    + "\nAddress: " + org.getAddress()
-                    + "\nTime created: " + org.getTimeCreated()
-                    + "\nTime last edit: " + org.getTimeLastEdited());
+
+        if(record.returnFields().length == 5) {
+            System.out.println("Name: " + record.getName()
+                    + "\nSurname: " + record.getSurname()
+                    + "\nBirth date: " + record.getBirthDate()
+                    + "\nGender: " + record.getGender()
+                    + "\nNumber: " + record.getNumber());
         }
-        scanner.nextLine();
+        else {
+            System.out.println("Organization name: " + record.getName()
+                    + "\nNumber: " + record.getNumber()
+                    + "\nAddress: " + record.getAddress());
+        }
+        System.out.println("Time created: " + record.getTimeCreated()
+                + "\nTime last edit: " + record.getTimeLastEdited());
+        System.out.println();
     }
-    public static void removeContacts(){
+    public static void removeContacts(int idx){
         if(recordList.isEmpty()){
             System.out.println("No records to remove!");
         }else{
-            listContacts();
-            System.out.println("Select a record: ");
-            recordList.remove(scanner.nextInt() - 1);
+            recordList.remove(idx);
             System.out.println("The record removed!");
         }
     }
 
     public static void countContacts(){
         System.out.println("The Phone Book has " + recordList.size() + " records.");
+    }
+
+    public static List<Record> getRecordList() {
+        return recordList;
+    }
+
+    public static void setRecordList(List<Record> recordList) {
+        Contacts.recordList = recordList;
     }
 }

@@ -11,7 +11,6 @@ public class Person extends Record{
         surname(surname);
         birthDate(birthDate);
         gender(gender);
-        setPerson(true);
     }
     private void birthDate(String birthDate){
         if(birthDate.equals("")){
@@ -80,5 +79,9 @@ public class Person extends Record{
 
     public String getGender() {
         return gender;
+    }
+
+    public String[] returnFields(){
+        return new String[]{"name", "surname", "birth date", "gender", "number"};
     }
 }

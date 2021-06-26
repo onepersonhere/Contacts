@@ -7,7 +7,6 @@ public class Organisation extends Record {
         super(number);
         orgName(orgName);
         address(address);
-        setPerson(false);
     }
 
     private void orgName(String orgName){
@@ -27,7 +26,7 @@ public class Organisation extends Record {
         }
     }
 
-    public void setOrgName(String orgName) {
+    public void setName(String orgName) {
         orgName(orgName);
         setTimeLastEdited();
     }
@@ -41,7 +40,11 @@ public class Organisation extends Record {
         return address;
     }
 
-    public String getOrgName() {
+    public String getName() {
         return orgName;
+    }
+
+    public String[] returnFields(){
+        return new String[]{"name", "address", "number"};
     }
 }

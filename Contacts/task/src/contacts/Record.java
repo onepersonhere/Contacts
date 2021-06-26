@@ -1,14 +1,15 @@
 package contacts;
 
+import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class Record {
+public class Record implements Serializable {
+    private static final long serialVersionUID = 1L;
     private String number = "";
     private String timeCreated;
     private String timeLastEdited = "";
-    private boolean isPerson;
     Record(String number){
         setNumber(number);
         timeCreated = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm").format(new java.util.Date());
@@ -68,11 +69,16 @@ public class Record {
         return timeLastEdited;
     }
 
-    public void setPerson(boolean person) {
-        isPerson = person;
-    }
+    public void setSurname(String s){}
+    public String getSurname(){return "";}
+    public void setName(String s){}
+    public String getName(){return "";}
+    public void setBirthDate(String s){}
+    public String getBirthDate(){return "";}
+    public void setGender(String s){}
+    public String getGender(){return "";}
+    public void setAddress(String s){}
+    public String getAddress(){return "";}
+    public String[] returnFields(){return new String[]{};};
 
-    public boolean getPerson(){
-        return isPerson;
-    }
 }
